@@ -79,14 +79,14 @@ class ZohoInventoryService
     /**
      * @throws ZohoException
      */
-    public function createCustomerAndSalesOrder(array $data): array
+    public function createCustomer(array $data)
     {
         $customerResponse = Http::withHeaders($this->headers())
             ->post("{$this->baseUrl}/contacts", [
-                'contact_name' => $data['customer']['name'],
+                'contact_name' => $data['name'],
                 'contact_persons' => [[
-                    'email' => $data['customer']['email'],
-                    'phone' => $data['customer']['phone']
+                    'email' => $data['email'],
+                    'phone' => $data['phone']
                 ]]
             ]);
 
@@ -96,10 +96,29 @@ class ZohoInventoryService
             throw new ZohoException('Failed to create customer');
         }
 
+        return $customer;
+    }
+
+
+    public function getCustomers()
+    {
+        $response = Http::withHeaders($this->headers())->get("{$this->baseUrl}/contacts", [
+            'organization_id' => $this->organizationId
+        ]);
+
+        return $response->json()['contacts'] ?? null;
+    }
+
+    /**
+     * @throws ZohoException
+     */
+    public function createSalesOrder(array $data): array
+    {
+
 
         $salesOrderResponse = Http::withHeaders($this->headers())
             ->post("{$this->baseUrl}/salesorders", [
-                'customer_id' => $customer['contact_id'],
+                'customer_id' => $data['contact_id'],
                 'line_items' => $data['items']
             ]);
 
@@ -110,7 +129,6 @@ class ZohoInventoryService
         $salesOrder = $salesOrderResponse->json()['sales_order'] ?? null;
 
         return [
-            'customer' => $customer,
             'salesOrder' => $salesOrder
         ];
 

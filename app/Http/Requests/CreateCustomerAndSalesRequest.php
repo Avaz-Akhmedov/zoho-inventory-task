@@ -16,9 +16,7 @@ class CreateCustomerAndSalesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer.name' => 'required|string',
-            'customer.email' => 'required|email',
-            'customer.phone' => 'required|string',
+            'contact_id' => ['required', 'integer'],
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|string',
             'items.*.quantity' => 'required|numeric|min:1',

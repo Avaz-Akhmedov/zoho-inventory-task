@@ -1,28 +1,26 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Inventory;
 
 use App\Exceptions\ZohoException;
-use App\Http\Requests\CreateCustomerAndSalesRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreCustomerRequest;
 use App\Services\ZohoInventoryService;
-use Exception;
 use Illuminate\Http\JsonResponse;
 
-class ZohoInventoryController extends Controller
+class CustomerController extends Controller
 {
     public function __construct(protected ZohoInventoryService $zohoService)
     {
     }
 
-    /**
-     * @throws Exception
-     */
-    public function getInventoryItems(): JsonResponse
+    public function index(): JsonResponse
     {
         try {
-            $response = $this->zohoService->getInventoryItems();
-
+            $response = $this->zohoService->getCustomers();
             return response()->json($response);
+
+
         } catch (ZohoException $exception) {
             return response()->json([
                 'message' => $exception->getMessage()
@@ -30,20 +28,20 @@ class ZohoInventoryController extends Controller
         }
     }
 
-
-
-
-    public function createSalesOrder(CreateCustomerAndSalesRequest $request): JsonResponse
+    /**
+     * @param StoreCustomerRequest $request
+     * @return JsonResponse
+     */
+    public function store(StoreCustomerRequest $request): JsonResponse
     {
         try {
-            $response = $this->zohoService->createSalesOrder($request->validated());
+            $response = $this->zohoService->createCustomer($request->validated());
 
             return response()->json($response);
         } catch (ZohoException $exception) {
             return response()->json([
                 'message' => $exception->getMessage()
-            ], 500);
+            ]);
         }
-
     }
 }
